@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.SerializationUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.rabbitmq.OutboundMessage;
-import reactor.rabbitmq.QueueSpecification;
 import reactor.rabbitmq.Sender;
 import com.bootlab.producer.model.StockInventory;
 
@@ -21,31 +19,8 @@ import com.bootlab.producer.model.StockInventory;
 public class InventoryService {
 
     private final Sender sender;
+
     private final ObjectMapper mapper;
-/*
-
-    public Mono<Boolean> createInventory(StockInventory stockInventory) throws JsonProcessingException {
-
-        String json = mapper.writeValueAsString(stockInventory);
-        byte[] orderByteArray = SerializationUtils.serialize(json);
-        Flux<OutboundMessage> outboundFlux = Flux.just( new OutboundMessage(
-                "",
-                AppConstant.QUEUE, orderByteArray));
-
-        sender.declareQueue(QueueSpecification.queue(AppConstant.QUEUE))
-                .thenMany(sender.sendWithPublishConfirms(outboundFlux))
-                .doOnError(e -> log.error("send failed with: ", e))
-                .subscribeOn(Schedulers.immediate())
-                .subscribe(r -> {
-                    if (r.isAck()) {
-                        log.info("StockInventory sent successfully");
-                    }
-                });
-
-        return Mono.just(Boolean.TRUE);
-
-    }
-*/
 
     /**
      * Method send message to queue with publish confirms
@@ -53,18 +28,15 @@ public class InventoryService {
     public Mono<Boolean> createInventory(StockInventory stockInventory) throws JsonProcessingException {
         String json = mapper.writeValueAsString(stockInventory);
         byte[] orderByteArray = SerializationUtils.serialize(json);
-        Flux<OutboundMessage> outboundFlux = Flux.just( new OutboundMessage(
-                "",
-                AppConstant.QUEUE, orderByteArray));
+        Flux<OutboundMessage> outboundFlux = Flux.just(new OutboundMessage("", AppConstant.QUEUE, orderByteArray));
 
         sender.sendWithPublishConfirms(outboundFlux)
-                .doOnError(t -> log.error("Error while send message to queue {}, {}",  AppConstant.QUEUE, t))
+                .doOnError(t -> log.error("Error while send message to queue {}, {}", AppConstant.QUEUE, t))
                 .subscribe(result -> {
                     if (result.isReturned()) {
-                        log.error("Error while send message to queue {}",  AppConstant.QUEUE);
+                        log.error("Error while send message to queue {}", AppConstant.QUEUE);
                     }
                 });
-
 
         return Mono.just(Boolean.TRUE);
     }

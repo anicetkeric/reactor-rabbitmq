@@ -8,7 +8,6 @@ import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -19,16 +18,6 @@ public class RabbitMQInit {
     private Mono<Connection> connectionMono;
 
     private final AmqpAdmin amqpAdmin;
-
-/*
-    @PostConstruct
-    public void init() {
-        amqpAdmin.declareQueue(new Queue(REQUEST_QUEUE, false, false, true));
-        amqpAdmin.declareQueue(new Queue(RESPONSE_QUEUE, false, false, true));
-    }
-
-*/
-
 
     /**
      * Method create exchanges, bindings, queues on start.

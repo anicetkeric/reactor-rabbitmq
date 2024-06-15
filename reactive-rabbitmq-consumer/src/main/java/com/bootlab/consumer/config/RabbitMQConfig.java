@@ -1,4 +1,4 @@
-package com.bootlab.producer.config;
+package com.bootlab.consumer.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -11,8 +11,8 @@ import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.rabbitmq.*;
+
 
 @Configuration
 public class RabbitMQConfig {
@@ -29,15 +29,14 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public SenderOptions senderOptions(Mono<Connection> connectionMono) {
-        return new SenderOptions()
-                .connectionMono(connectionMono)
-                .resourceManagementScheduler(Schedulers.boundedElastic());
+    public ReceiverOptions receiverOptions(Mono<Connection> connectionMono) {
+        return new ReceiverOptions()
+                .connectionMono(connectionMono);
     }
 
     @Bean
-    public Sender sender(SenderOptions senderOptions) {
-        return RabbitFlux.createSender(senderOptions);
+    public Receiver receiver(ReceiverOptions receiverOptions) {
+        return RabbitFlux.createReceiver(receiverOptions);
     }
 
     @Bean
