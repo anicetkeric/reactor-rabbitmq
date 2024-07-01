@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -15,19 +19,24 @@ public class InventoryService {
 
     private final ObjectMapper mapper;
 
-    public void saveInventory(Delivery message) {
+    public Mono<Boolean> saveInventory(Delivery message) {
 
         String json = SerializationUtils.deserialize(message.getBody());
-        StockInventory productOrder;
-        // 2. map json to order object
+        var inventory = readValue(json);
+        if(Objects.isNull(inventory)) return Mono.just(Boolean.FALSE);
+
+        log.info("######################################## Consumer DATA ####################################");
+        log.info(">> Inventory data: {}", inventory.toString());
+
+        return Mono.just(Boolean.TRUE);
+    }
+
+    private StockInventory readValue(String body) {
         try {
-            productOrder = mapper.readValue(json, StockInventory.class);
-            System.out.println("JSON String deserializer: => "+json.toString());
-            System.out.println("ObjectToString: => "+productOrder.toString());
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
+            return mapper.readValue(body, StockInventory.class);
+        } catch (IOException e) {
+            log.error(">> Deserialize error");
+            return null;
         }
     }
 

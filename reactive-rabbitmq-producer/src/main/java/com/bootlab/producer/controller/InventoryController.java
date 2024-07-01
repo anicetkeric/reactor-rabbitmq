@@ -15,9 +15,9 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @PostMapping(value = "/orderCreate")
+    @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Mono<Boolean> createInventory(@RequestBody StockInventory stockInventory) throws JsonProcessingException {
+    public Mono<Void> createInventory(@RequestBody StockInventory stockInventory) throws JsonProcessingException {
         return inventoryService.createInventory(stockInventory);
     }
 }
