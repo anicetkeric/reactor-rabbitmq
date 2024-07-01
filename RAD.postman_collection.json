@@ -1,0 +1,64 @@
+{
+	"info": {
+		"_postman_id": "ee1afc0a-eed0-4641-84ea-9094c1d66d2f",
+		"name": "RAD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36568418"
+	},
+	"item": [
+		{
+			"name": "inventory",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let lodash = require('lodash')",
+							"let uuid = require('uuid');",
+							"let id = uuid.v4();",
+							"",
+							"const randomString = pm.variables.replaceIn('{{$randomUUID}}').substring(0, 10);",
+							"",
+							"let payload = {",
+							"    \"id\": id,",
+							"    \"qty\": lodash.random(1, 250),",
+							"    \"number\": randomString",
+							"}",
+							"",
+							"// Store the payload in a runtime-only variable ",
+							"pm.variables.set('payload', JSON.stringify(payload));",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{payload}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/inventory",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"inventory"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
